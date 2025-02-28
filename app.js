@@ -46,5 +46,28 @@ app.get("/albums/:artistId", (req, res, next) => {
   });
 });
 
+app.get("/tracks/:albumId", (req, res, next) => {
+  spotifyApi
+    .getAlbumTracks(req.params.albumId)
+    .then((data) => {
+      const tracks = data.body.items;
+      // Get album info to display album name and image
+      spotifyApi
+        .getAlbum(req.params.albumId)
+        .then((albumData) => {
+          const albumInfo = albumData.body;
+          res.render("tracks", { tracks, album: albumInfo });
+        })
+        .catch((error) => {
+          console.error("Error getting album info:", error);
+          next(error);
+        });
+    })
+    .catch((error) => {
+      console.error("Error getting album tracks:", error);
+      next(error);
+    });
+});
+
 // Start listening the server
 app.listen(3000, () => console.log("My Spotify project running on port 3000 🎧 🥁 🎸 🔊"));
